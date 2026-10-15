@@ -39,7 +39,6 @@ jobs:
         run: npm run audit
 
   staging-integration:
-    if: ${{ secrets.SUPABASE_URL != '' && secrets.SUPABASE_ANON_KEY != '' && secrets.SUPABASE_SERVICE_ROLE_KEY != '' && secrets.TEST_USER_A_EMAIL != '' && secrets.TEST_USER_B_EMAIL != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
