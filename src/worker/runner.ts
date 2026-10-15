@@ -28,7 +28,7 @@ async function scoreMatches(payload: Record<string, unknown>) {
   return count;
 }
 
-async function process(record: QueueRecord, queue: ReturnType<typeof postgresQueue>) {
+async function processRecord(record: QueueRecord, queue: ReturnType<typeof postgresQueue>) {
   if (record.job_type === 'ingest_jobs') return runIngestionCycle(undefined, queue);
   if (record.job_type === 'score_matches') return scoreMatches(record.payload);
   if (record.job_type === 'send_notifications') return 0;
@@ -42,7 +42,7 @@ export async function runWorkerOnce(workerId = `worker-${process.pid}`) {
   const records = await queue.claim(workerId, 5);
   const results: { id: string; status: 'succeeded' | 'retrying' | 'dead' }[] = [];
   for (const record of records) {
-    try { await process(record, queue); await queue.complete(record.id); results.push({ id: record.id, status: 'succeeded' }); }
+    try { await processRecord(record, queue); await queue.complete(record.id); results.push({ id: record.id, status: 'succeeded' }); }
     catch (error) { await queue.fail(record.id, error instanceof Error ? error.message : 'Unknown worker error'); results.push({ id: record.id, status: record.attempts >= record.max_attempts ? 'dead' : 'retrying' }); }
   }
   return results;
