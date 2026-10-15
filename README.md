@@ -13,6 +13,8 @@ Production-oriented foundation for a consent-first, multi-user job discovery and
 
 Useful checks: `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
 
+`npm run audit` runs the dependency audit with a critical-severity gate. The current audit reports five high-severity `braces` findings inherited through `eslint-config-next`/`fast-glob`; npm has no patched `braces` release beyond 3.0.3, so this residual development-tooling issue is surfaced rather than hidden and should be revisited when the dependency chain changes.
+
 ## Architecture
 
 - Next.js App Router + TypeScript + Tailwind for the web UI.

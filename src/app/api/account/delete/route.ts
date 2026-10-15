@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   const confirmation = (await request.json().catch(() => ({})) as { confirmation?: string }).confirmation;
   if (confirmation !== 'DELETE MY ACCOUNT') return NextResponse.json({ error: 'Explicit confirmation is required.' }, { status: 400 });
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ error: 'Deletion service is not configured.' }, { status: 503 });
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
