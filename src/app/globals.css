@@ -1,0 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+@tailwind base; @tailwind components; @tailwind utilities;
+:root { color-scheme: light; } * { box-sizing: border-box; } body { margin: 0; background: #f7f8fb; color: #172039; font-family: 'DM Sans', sans-serif; } h1,h2,h3 { font-family: Manrope, sans-serif; }
+.card { @apply rounded-xl border border-slate-200 bg-white p-5 shadow-soft; } .eyebrow { @apply mb-2 text-[10px] font-bold uppercase tracking-[.2em] text-brand; } .btn { @apply rounded-lg px-4 py-2 text-sm font-bold transition; } .btn-primary { @apply btn bg-brand text-white hover:bg-indigo-700; } .btn-outline { @apply btn border border-slate-200 bg-white text-slate-600 hover:bg-slate-50; } .input { @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-4 focus:ring-indigo-100; }
