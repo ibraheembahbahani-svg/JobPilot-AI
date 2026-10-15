@@ -2,11 +2,15 @@
 
 ## Staging database
 
-Create a Supabase staging project, apply `supabase/migrations/0001_initial.sql`, `0002_live_discovery.sql`, and `0003_operational_platform.sql` in order, then set the variables in `.env.example`. Keep `SUPABASE_SERVICE_ROLE_KEY` server-side only. Configure two test accounts and run `npm run test:integration` with the six `TEST_USER_*` variables. The integration test verifies cross-user preference isolation and service-role queue persistence; storage policy checks should be run from the Supabase SQL editor with the same two users before production rollout.
+Create a dedicated Supabase staging project, set its URL and anon key, and apply the migrations in order with `supabase db push --db-url "$STAGING_DATABASE_URL"` or the Supabase SQL editor. Run `npm run db:validate` first and `supabase db reset` locally to exercise `supabase/config.toml` and `supabase/seed.sql`. Keep `SUPABASE_SERVICE_ROLE_KEY` server-side only. Configure two test accounts and run `npm run test:integration:required` with the seven staging variables. The integration test verifies cross-user preference isolation, private resume upload, forbidden cross-user download, cleanup, and queue persistence. Account export/deletion must be smoke-tested from the deployed staging app because those operations are destructive.
+
+## Hosting
+
+Create separate Vercel projects or environments for staging and production. Set the staging project’s default `*.vercel.app` URL as `APP_URL`, expose only `NEXT_PUBLIC_*` values to the browser, and configure service-role, worker, OpenAI, and email secrets only as server environment variables. Deploy a preview, verify `/api/health`, then test sign-up, login, resume upload, job discovery, and dashboard flows against the reachable preview URL. A successful build is not a deployment confirmation.
 
 ## Worker deployment
 
-The queue is Postgres-backed, so it works with a scheduled HTTP call or a small long-running worker on Render, Fly.io, Railway, or a container platform. Call `POST /api/worker` with `x-worker-secret` from a scheduler at the configured discovery interval. A worker process should claim `worker_jobs` through `claim_worker_jobs`, process each item, then call the queue `complete` or `fail` operation. Failed jobs retry with exponential backoff and become `dead` after five attempts. Add an alert on `worker_jobs.status = 'dead'` and stale `worker_health.last_seen_at`.
+The queue is Postgres-backed, so it works with a scheduled HTTP call or a small long-running worker on Render, Fly.io, Railway, or a container platform. Call `POST /api/worker` with `x-worker-secret` from a scheduler, then call `POST /api/worker/run` from a worker or scheduled container. The worker claims `worker_jobs`, performs ingestion or scoring, and records success/retry/dead state. Failed jobs retry with exponential backoff and become `dead` after five attempts. Add an alert on `worker_jobs.status = 'dead'` and stale `worker_health.last_seen_at`.
 
 This avoids a separate queue vendor at MVP scale, but Postgres compute and scheduled invocations are still billable and have connection/throughput limits. Move to Redis/BullMQ or a managed queue when job volume or concurrency outgrows the database.
 

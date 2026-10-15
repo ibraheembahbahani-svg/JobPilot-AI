@@ -1,0 +1,14 @@
+project_id = "jobpilot-staging"
+
+[db]
+major_version = 15
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true

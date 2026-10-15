@@ -12,6 +12,8 @@
     "audit": "npm audit --audit-level=critical",
     "e2e": "playwright test",
     "test:integration": "node scripts/integration-check.mjs",
+    "test:integration:required": "node scripts/integration-required.mjs",
+    "db:validate": "node scripts/validate-migrations.mjs",
     "audit:full": "npm audit --json"
   },
   "dependencies": {

@@ -37,6 +37,8 @@ jobs:
         run: npm run e2e
       - name: Dependency audit
         run: npm run audit
+      - name: Validate migration safety markers
+        run: npm run db:validate
 
   staging-integration:
     runs-on: ubuntu-latest
@@ -48,8 +50,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Two-account Supabase integration and RLS test
-        run: npm run test:integration
+      - name: Two-account Supabase integration and RLS test (required release gate)
+        run: npm run test:integration:required
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
