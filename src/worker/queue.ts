@@ -8,6 +8,12 @@ import { createSupabaseAdmin } from '@/lib/supabase/admin';
 export type WorkerJob = 'ingest_jobs' | 'score_matches' | 'prepare_review' | 'send_notifications';
 export type QueueClient = { enqueue: (job: WorkerJob, payload: Record<string, unknown>, options?: { idempotencyKey?: string; delayMs?: number }) => Promise<void> };
 export const localQueue: QueueClient = { async enqueue(job, payload) { console.info(JSON.stringify({ event: 'worker.enqueue', job, payload })); } };
+export function createQueue(): QueueClient {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return localQueue;
+  // Loaded only on the server when credentials are configured.
+  const { postgresQueue } = require('./postgres-queue') as typeof import('./postgres-queue');
+  return postgresQueue();
+}
 export const configuredAdapters = (): JobAdapter[] => { const adapters: JobAdapter[] = []; if (process.env.GREENHOUSE_BOARDS) process.env.GREENHOUSE_BOARDS.split(',').map((x) => x.trim()).filter(Boolean).forEach((board) => adapters.push(greenhouseAdapter(board))); if (process.env.LEVER_COMPANIES) process.env.LEVER_COMPANIES.split(',').map((x) => x.trim()).filter(Boolean).forEach((company) => adapters.push(leverAdapter(company))); return adapters; };
 
 export async function runIngestionCycle(adapters = configuredAdapters(), queue: QueueClient = localQueue) {

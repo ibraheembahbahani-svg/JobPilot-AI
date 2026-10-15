@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "audit": "npm audit --audit-level=critical",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "test:integration": "node scripts/integration-check.mjs",
+    "audit:full": "npm audit --json"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
