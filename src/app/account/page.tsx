@@ -1,0 +1,3 @@
+import Link from 'next/link';
+import { SignOutButton } from '@/app/components/sign-out-button';
+export default function AccountPage() { return <main className="min-h-screen bg-canvas"><div className="mx-auto max-w-3xl px-6 py-10"><Link href="/dashboard" className="text-sm font-bold text-brand">← Dashboard</Link><div className="card mt-10"><p className="eyebrow">ACCOUNT</p><h1 className="text-3xl font-extrabold">Privacy and access</h1><p className="mt-3 text-sm text-slate-500">Export your account data or sign out. Deletion requires the explicit confirmation phrase through the protected API.</p><div className="mt-6 flex flex-wrap gap-3"><a className="btn-outline" href="/api/account/export">Export data</a><SignOutButton /></div></div></div></main>; }

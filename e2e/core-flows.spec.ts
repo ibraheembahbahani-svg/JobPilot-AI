@@ -1,0 +1,3 @@
+import { test, expect } from '@playwright/test';
+test('landing page links into the sandbox dashboard', async ({ page }) => { await page.goto('/'); await expect(page.getByRole('heading', { name: /safer way/i })).toBeVisible(); await page.getByRole('link', { name: /open sandbox/i }).click(); await expect(page).toHaveURL(/dashboard/); await expect(page.getByRole('heading', { name: /good to see you/i })).toBeVisible(); });
+test('job discovery keeps mocked source visibly labeled', async ({ page }) => { await page.goto('/jobs'); await expect(page.getByRole('heading', { name: /discover jobs/i })).toBeVisible(); await expect(page.getByText('MOCK SOURCE', { exact: true })).toBeVisible(); await expect(page.getByRole('link', { name: /data science intern/i })).toBeVisible(); });

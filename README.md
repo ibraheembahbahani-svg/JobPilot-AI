@@ -11,7 +11,7 @@ Production-oriented foundation for a consent-first, multi-user job discovery and
 5. Apply `supabase/migrations/0001_initial.sql` through the Supabase CLI or SQL editor.
 6. Run `npm run dev` and open `http://localhost:3000`.
 
-Useful checks: `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
+Useful checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, and `npm run e2e`.
 
 `npm run audit` runs the dependency audit with a critical-severity gate. The current audit reports five high-severity `braces` findings inherited through `eslint-config-next`/`fast-glob`; npm has no patched `braces` release beyond 3.0.3, so this residual development-tooling issue is surfaced rather than hidden and should be revisited when the dependency chain changes.
 
@@ -22,7 +22,10 @@ Useful checks: `npm run lint`, `npm run typecheck`, `npm test`, and `npm run bui
 - `src/lib/mock-ingestion.ts` is the only enabled source adapter. It is intentionally labeled mocked and uses deterministic freshness/deduplication.
 - `src/lib/matching.ts` is an interpretable baseline matcher. The OpenAI boundary in `src/lib/openai.ts` is present for a future structured matcher/tailoring service; it is not called without an API key.
 - `src/worker/queue.ts` defines the queue contract. Replace `localQueue` with a managed worker provider and keep the worker secret server-side.
+- `src/lib/ingestion/greenhouse.ts` and `src/lib/ingestion/lever.ts` use documented public ATS endpoints, retain source URLs, paginate where supported, retry transient failures, and leave unknown timestamps/locations unset.
 - `src/lib/application-state.ts` centralizes legal application transitions and hard safety gates.
+
+Sprint 3 adds `supabase/migrations/0002_live_discovery.sql` for preferences, saved/dismissed jobs, matches, search history, ingestion runs, indexes, private resume storage, and RLS. Set `GREENHOUSE_BOARDS` and/or `LEVER_COMPANIES` to enable worker adapter configuration; the browser dashboard remains visibly mocked unless a live endpoint is requested.
 
 ## Safety and production boundaries
 
@@ -39,3 +42,5 @@ Resume files and extracted profile data are sensitive. Use private Supabase Stor
 - Data export/deletion routes, billing/abuse controls, legal/privacy review, and end-to-end tests against staging integrations.
 
 This repository is not claimed to be production-ready until those integrations, credentials, deployment controls, and staging tests are completed.
+
+The worker is not continuously operational from this repository alone. Deploy `src/worker/queue.ts` behind a managed scheduler/queue, provide `WORKER_SECRET` and `SUPABASE_SERVICE_ROLE_KEY`, add durable retry/concurrency controls, and verify ingestion runs in staging before calling discovery continuous.
