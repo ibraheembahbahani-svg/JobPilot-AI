@@ -1,0 +1,7 @@
+import { z } from 'zod';
+import { fetchJson } from './http';
+import type { JobAdapter } from './types';
+import type { Job } from '@/lib/types';
+const schema = z.object({ jobs: z.array(z.object({ id: z.number(), title: z.string(), updated_at: z.string().optional(), location: z.object({ name: z.string() }).optional(), absolute_url: z.string().url(), content: z.string().optional(), departments: z.array(z.object({ name: z.string() })).optional() })) });
+export function greenhouseAdapter(board: string): JobAdapter { return { source: `greenhouse:${board}`, async fetchPage(cursor) { const page = Number(cursor || 1); const url = `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(board)}/jobs?content=true&page=${page}`; const data = schema.parse(await fetchJson<unknown>(url)); return { source: `greenhouse:${board}`, nextCursor: data.jobs.length === 100 ? String(page + 1) : undefined, jobs: data.jobs.map((job) => ({ id: `${board}:${job.id}`, source: `greenhouse:${board}`, sourceUrl: job.absolute_url, externalId: String(job.id), title: job.title, company: board, location: job.location?.name, arrangement: inferArrangement(job.location?.name), skills: job.departments?.map((department) => department.name) || [], description: job.content || '', postedAt: job.updated_at, rawPayload: job } as Job)) }; } }; }
+function inferArrangement(location?: string): Job['arrangement'] { const value = (location || '').toLowerCase(); return value.includes('remote') ? 'remote' : value.includes('hybrid') ? 'hybrid' : value ? 'onsite' : undefined; }

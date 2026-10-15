@@ -1,0 +1,3 @@
+import { describe, expect, it, vi } from 'vitest';
+import { greenhouseAdapter } from './greenhouse';
+describe('Greenhouse adapter', () => { it('maps source data without inventing timestamps and paginates', async () => { vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ jobs: Array.from({ length: 100 }, (_, index) => ({ id: index, title: 'Role', absolute_url: `https://example.test/${index}`, location: { name: 'Remote' }, content: '<p>x</p>' })) }) })); const page = await greenhouseAdapter('demo').fetchPage(); expect(page.jobs).toHaveLength(100); expect(page.jobs[0].postedAt).toBeUndefined(); expect(page.nextCursor).toBe('2'); vi.unstubAllGlobals(); }); });

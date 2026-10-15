@@ -6,7 +6,7 @@ export function scoreJob(job: Job, profile: Profile): MatchResult {
   const title = normalize(job.title);
   const roleHits = profile.targetRoles.filter((role) => title.includes(normalize(role))).length;
   const skillHits = job.skills.filter((skill) => profile.skills.some((candidate) => normalize(candidate) === normalize(skill))).length;
-  const locationHit = profile.locations.length === 0 || profile.locations.some((location) => normalize(job.location).includes(normalize(location)));
+  const locationHit = profile.locations.length === 0 || profile.locations.some((location) => normalize(job.location || '').includes(normalize(location)));
   const salaryHit = !profile.salaryMin || !job.salaryMax || job.salaryMax >= profile.salaryMin;
   const reasons: string[] = [];
   const gaps: string[] = [];

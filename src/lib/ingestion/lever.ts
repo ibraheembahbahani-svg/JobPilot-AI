@@ -1,0 +1,7 @@
+import { z } from 'zod';
+import { fetchJson } from './http';
+import type { JobAdapter } from './types';
+import type { Job } from '@/lib/types';
+const schema = z.array(z.object({ id: z.string(), text: z.string(), hostedUrl: z.string().url(), descriptionPlain: z.string().optional(), categories: z.object({ location: z.string().optional(), team: z.string().optional(), commitment: z.string().optional() }).optional(), createdAt: z.number().optional(), updatedAt: z.number().optional() }));
+export function leverAdapter(company: string): JobAdapter { return { source: `lever:${company}`, async fetchPage() { const data = schema.parse(await fetchJson<unknown>(`https://api.lever.co/v0/postings/${encodeURIComponent(company)}?mode=json`)); return { source: `lever:${company}`, jobs: data.map((job) => ({ id: `${company}:${job.id}`, source: `lever:${company}`, sourceUrl: job.hostedUrl, externalId: job.id, title: job.text, company, location: job.categories?.location, arrangement: inferArrangement(job.categories?.location), employmentType: job.categories?.commitment, skills: job.categories?.team ? [job.categories.team] : [], description: job.descriptionPlain || '', postedAt: job.createdAt ? new Date(job.createdAt).toISOString() : undefined, rawPayload: job } as Job)) }; } }; }
+function inferArrangement(location?: string): Job['arrangement'] { const value = (location || '').toLowerCase(); return value.includes('remote') ? 'remote' : value.includes('hybrid') ? 'hybrid' : value ? 'onsite' : undefined; }

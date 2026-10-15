@@ -3,8 +3,8 @@ export type ApplicationStatus = 'saved' | 'queued' | 'needs_review' | 'submitted
 
 export type Job = {
   id: string; source: string; sourceUrl: string; externalId: string; title: string; company: string;
-  location: string; arrangement: WorkArrangement; salaryMin?: number; salaryMax?: number;
-  skills: string[]; description: string; postedAt: string; expiresAt?: string;
+  location?: string; arrangement?: WorkArrangement; employmentType?: string; salaryMin?: number; salaryMax?: number;
+  skills: string[]; description: string; postedAt?: string; expiresAt?: string; rawPayload?: unknown;
 };
 
 export type Profile = {

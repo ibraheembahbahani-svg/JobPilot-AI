@@ -12,5 +12,5 @@ export const mockSource: JobSourceAdapter = {
 
 export function deduplicateFreshJobs(jobs: Job[], now = Date.now()) {
   const seen = new Set<string>();
-  return jobs.filter((job) => { const key = `${job.source}:${job.externalId}`; const fresh = now - new Date(job.postedAt).getTime() < 1000 * 60 * 60 * 24 * 30; if (seen.has(key) || !fresh) return false; seen.add(key); return true; });
+  return jobs.filter((job) => { const key = `${job.source}:${job.externalId}`; const postedAt = job.postedAt ? new Date(job.postedAt).getTime() : undefined; const fresh = postedAt === undefined || now - postedAt < 1000 * 60 * 60 * 24 * 30; if (seen.has(key) || !fresh) return false; seen.add(key); return true; });
 }
