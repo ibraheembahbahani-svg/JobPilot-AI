@@ -4,7 +4,7 @@ Production-oriented foundation for a consent-first, multi-user job discovery and
 
 ## Local setup
 
-1. Install Node.js 20+.
+1. Install Node.js 22+ (the CI and staging baseline).
 2. Run `npm install`.
 3. Copy `.env.example` to `.env.local`.
 4. Add a Supabase project URL and anon key for real auth/data, or leave them blank to use the local UI sandbox.
